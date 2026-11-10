@@ -1,0 +1,11 @@
+# Node
+node_modules/
+
+# Astro Build Output
+dist/
+.astro/
+
+# env/secrets
+.env
+.env.*
+!.env.example

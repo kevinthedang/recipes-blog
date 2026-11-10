@@ -1,0 +1,43 @@
+---
+import '../styles/site.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'The Recipe Box',
+  description = 'A little home for the recipes worth making again.'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f6f4eb" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="wordmark" href="/" aria-label="The Recipe Box home"><span class="mark">R</span><span>THE RECIPE BOX</span></a>
+        <span class="header-note">Good things, kept close.</span>
+        <a class="header-link" href="/#recipes">Browse recipes <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+    <slot />
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <span class="wordmark"><span class="mark">R</span><span>THE RECIPE BOX</span></span>
+        <span>A growing collection from my kitchen to yours.</span>
+      </div>
+    </footer>
+  </body>
+</html>

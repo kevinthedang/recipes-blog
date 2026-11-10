@@ -1,0 +1,41 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { recipes } from '../../data/recipes';
+import '../../styles/recipe.css';
+
+export function getStaticPaths() {
+  return recipes.map((recipe) => ({ params: { slug: recipe.slug }, props: { recipe } }));
+}
+
+const { recipe } = Astro.props;
+---
+
+<SiteLayout title={`${recipe.title} | The Recipe Box`} description={recipe.description}>
+  <main class="shell recipe-page">
+    <a class="back-link" href="/#recipes"><span aria-hidden="true">←</span> All recipes</a>
+    <div class="recipe-layout">
+      <article class="recipe-content">
+        <p class="eyebrow">{recipe.category} <span>·</span> {recipe.time} <span>·</span> {recipe.serves}</p>
+        <h1 class="serif">{recipe.title}</h1>
+        <p class="description">{recipe.description}</p>
+        <img class="recipe-hero" src={recipe.image} alt={recipe.imageAlt} fetchpriority="high" />
+        <div class="recipe-columns">
+          <section>
+            <h2 class="serif">Ingredients</h2>
+            <ul>{recipe.ingredients.map((ingredient) => <li>{ingredient}</li>)}</ul>
+          </section>
+          <section>
+            <h2 class="serif">Method</h2>
+            <ol>{recipe.steps.map((step) => <li>{step}</li>)}</ol>
+          </section>
+        </div>
+      </article>
+      <aside class="recipe-aside">
+        <span class="aside-mark" aria-hidden="true">R</span>
+        <p>FROM THE RECIPE BOX</p>
+        <span class="aside-rule"></span>
+        <span>Keep this one<br />close by.</span>
+      </aside>
+    </div>
+  </main>
+</SiteLayout>

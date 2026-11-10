@@ -1,0 +1,109 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { categories, recipes } from '../data/recipes';
+import '../styles/home.css';
+
+const featured = recipes[0];
+---
+
+<SiteLayout title="The Recipe Box | Recipes worth keeping" description="A personal collection of weeknight favorites, reliable staples, and little sweet things.">
+  <main>
+    <section class="intro shell">
+      <div class="intro-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> A PERSONAL COOKBOOK, ONLINE</p>
+        <h1 class="serif">Recipes worth<br />keeping <em>close.</em></h1>
+        <p class="intro-text">The dishes I come back to, collected in one place. Find a new favorite or get straight to the one you know.</p>
+        <a class="text-link" href="#recipes">Explore the collection <span aria-hidden="true">↓</span></a>
+      </div>
+      <a class="feature" href={`/recipes/${featured.slug}/`} aria-label={`Read ${featured.title}`}>
+        <img src={featured.image} alt={featured.imageAlt} fetchpriority="high" />
+        <div class="feature-label"><span>ON REPEAT</span><span>01 / 06</span></div>
+        <div class="feature-caption"><div><span class="feature-kicker">THIS WEEK'S FAVORITE</span><h2 class="serif">{featured.title}</h2></div><span class="feature-arrow" aria-hidden="true">↗</span></div>
+      </a>
+      <div class="intro-stamp" aria-hidden="true"><span>MADE<br />AGAIN</span><i>✳</i></div>
+    </section>
+
+    <section class="collection" id="recipes">
+      <div class="shell">
+        <div class="collection-heading">
+          <div>
+            <p class="eyebrow">THE COLLECTION</p>
+            <h2 class="serif">What sounds good?</h2>
+          </div>
+          <label class="search-box">
+            <span class="search-icon" aria-hidden="true"></span>
+            <input id="recipe-search" type="search" placeholder="Search recipes or ingredients" aria-label="Search recipes or ingredients" />
+            <kbd>/</kbd>
+          </label>
+        </div>
+
+        <div class="filters" role="group" aria-label="Filter by category">
+          {categories.map((category, index) => (
+            <button class:list={['filter-button', { active: index === 0 }]} type="button" data-category={index === 0 ? '' : category} aria-pressed={index === 0 ? 'true' : 'false'}>{category}</button>
+          ))}
+          <span class="recipe-count" id="recipe-count">{recipes.length} recipes</span>
+        </div>
+
+        <div class="recipe-grid" id="recipe-grid">
+          {recipes.map((recipe, index) => (
+            <article class="recipe-card" data-category={recipe.category} data-search={`${recipe.title} ${recipe.description} ${recipe.category} ${recipe.ingredients.join(' ')}`.toLowerCase()}>
+              <a class="recipe-image" href={`/recipes/${recipe.slug}/`}>
+                <img src={recipe.image} alt={recipe.imageAlt} loading="lazy" />
+                <span class="image-index">{String(index + 1).padStart(2, '0')}</span>
+              </a>
+              <div class="recipe-meta"><span>{recipe.category}</span><span>{recipe.time}</span></div>
+              <h3 class="serif"><a href={`/recipes/${recipe.slug}/`}>{recipe.title}</a></h3>
+              <p>{recipe.description}</p>
+            </article>
+          ))}
+        </div>
+        <p class="empty-state" id="empty-state" hidden>No recipes found. Try another search.</p>
+      </div>
+    </section>
+  </main>
+</SiteLayout>
+
+<script>
+  const searchInput = document.querySelector<HTMLInputElement>('#recipe-search');
+  const filterButtons = [...document.querySelectorAll<HTMLButtonElement>('.filter-button')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.recipe-card')];
+  const count = document.querySelector<HTMLElement>('#recipe-count');
+  const emptyState = document.querySelector<HTMLElement>('#empty-state');
+  let activeCategory = '';
+
+  function updateRecipes() {
+    const query = searchInput?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+
+    for (const card of cards) {
+      const matchesCategory = !activeCategory || card.dataset.category === activeCategory;
+      const matchesQuery = !query || card.dataset.search?.includes(query);
+      const isVisible = matchesCategory && matchesQuery;
+      card.hidden = !isVisible;
+      visible += Number(isVisible);
+    }
+
+    if (count) count.textContent = `${visible} ${visible === 1 ? 'recipe' : 'recipes'}`;
+    if (emptyState) emptyState.hidden = visible > 0;
+  }
+
+  for (const button of filterButtons) {
+    button.addEventListener('click', () => {
+      activeCategory = button.dataset.category ?? '';
+      for (const filter of filterButtons) {
+        const isActive = filter === button;
+        filter.classList.toggle('active', isActive);
+        filter.setAttribute('aria-pressed', String(isActive));
+      }
+      updateRecipes();
+    });
+  }
+
+  searchInput?.addEventListener('input', updateRecipes);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === '/' && !(event.target instanceof HTMLInputElement)) {
+      event.preventDefault();
+      searchInput?.focus();
+    }
+  });
+</script>
